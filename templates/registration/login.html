@@ -36,14 +36,13 @@
         <!-- templates/registration/login.html -->
 <form method="post">
     {% csrf_token %}
-    {{ form.non_field_errors }}
     <div>
         <label for="id_code">Code:</label>
-        {{ form.code }}
+        <input type="text" name="{{ form.code.name }}" id="id_code" value="{{ form.code.value|default_if_none:'' }}">
     </div>
     <div>
         <label for="id_password">Password:</label>
-        {{ form.password }}
+        <input type="password" name="{{ form.password.name }}" id="id_password" value="{{ form.password.value|default_if_none:'' }}">
     </div>
     <button type="submit">Login</button>
 </form>
