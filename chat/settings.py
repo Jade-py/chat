@@ -2,7 +2,6 @@ from pathlib import Path
 import pymysql
 import os
 from environs import Env
-from django.urls import reverse_lazy
 
 env = Env()
 env.read_env()
@@ -20,7 +19,7 @@ SECRET_KEY = 'django-insecure-i2qpqb56=_%(9v^c*p78a0q(2%)%2w3r$@#0%#x34dy!a54wfw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['172.16.11.6']
+ALLOWED_HOSTS = ['172.16.11.6', '127.0.0.1']
 
 AUTH_USER_MODEL = 'base.tblusers'
 
@@ -128,6 +127,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
+LOGIN_URL ='login'
 
 LOGIN_REDIRECT_URL='chat'
 
@@ -146,7 +146,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static/'
+]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
