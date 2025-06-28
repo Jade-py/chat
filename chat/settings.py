@@ -20,7 +20,7 @@ SECRET_KEY = 'django-insecure-i2qpqb56=_%(9v^c*p78a0q(2%)%2w3r$@#0%#x34dy!a54wfw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['172.16.11.6']
 
 AUTH_USER_MODEL = 'base.tblusers'
 
