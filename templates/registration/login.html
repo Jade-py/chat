@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="{% static 'bower_components/bootstrap/dist/css/bootstrap.min.css' %}" >
   <link rel="stylesheet" href="{% static 'bower_components/font-awesome/css/font-awesome.min.css' %}" >
   <link rel="stylesheet" href="{% static 'bower_components/Ionicons/css/ionicons.min.css' %}" >
-  <link rel="stylesheet" href="{% static 'dist/css/AdminLTE.min.css' %}">
+  <link rel="stylesheet" href="{% static 'dist/css/AdminLTE.css' %}">
   <link rel="stylesheet" href="{% static 'plugins/iCheck/square/blue.css' %}">
   
   <style>
@@ -87,14 +87,20 @@
 	  
 	  
     <p class="login-box-msg">Sign in to start your session</p>
+	{% if form.errors %}
+		<div class="alert alert-danger">
+			Invalid username or password.
+		</div>
+	{% endif %}
 
-    <form role="form" name="myform" method="POST" id="idForm">
+    <form method="post">
+    {% csrf_token %}
       <div class="form-group has-feedback">
-        <input type="text" class="form-control" placeholder="Emp code" name="code"  required>
+		<input type="text" class="form-control" name="{{ form.code.name }}" id="id_code" value="{{ form.code.value|default_if_none:'' }}" placeholder="Emp code">
         <span class="glyphicon glyphicon-user form-control-feedback"></span>
       </div>
       <div class="form-group has-feedback">
-        <input type="password" class="form-control" placeholder="Password"  name="password"   required>
+	    <input class="form-control" type="password" name="{{ form.password.name }}" id="id_password" value="{{ form.password.value|default_if_none:'' }}" placeholder="Password" >
         <span class="glyphicon glyphicon-lock form-control-feedback"></span>
       </div>
 	  
