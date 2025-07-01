@@ -24,7 +24,7 @@ ALLOWED_HOSTS = ['172.16.11.6', '127.0.0.1']
 AUTH_USER_MODEL = 'base.tblusers'
 
 AUTHENTICATION_BACKENDS = [
-    'base.auth_backends.PlainTextBackend',
+    'base.auth_backends.PlainTextBackend', # Authenticate users based on simple string matching
 ]
 
 
@@ -95,7 +95,7 @@ DATABASES = {
         'HOST': os.getenv('MYSQL_HOST'),
         'PORT': os.getenv('MYSQL_PORT'),
         'OPTIONS': {
-            'charset': 'utf8',
+            'charset': 'utf8mb4',
         }
     }
 }

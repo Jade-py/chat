@@ -7,11 +7,11 @@ from django.http import HttpResponse
 @login_required
 def chat_view(request, dept_id=None):
     try:
-        my_dept = request.user.userprofile.department
+        my_dept = request.user.userprofile.department # Try to get dept associated with user
     except AttributeError:
         return HttpResponse("Your account is not linked to any department.", status=403)
 
-    departments = Department.objects.exclude(id=my_dept.id)
+    departments = Department.objects.exclude(id=my_dept.id) # Get all the depts except the current user's to show on left side
     selected_dept = None
     messages = []
     file_form = UploadFileForm()
@@ -26,7 +26,7 @@ def chat_view(request, dept_id=None):
 
     files = UploadedFile.objects.all().order_by('-uploaded_at')
 
-    if dept_id:
+    if dept_id: # If dept_id is in url, get previous messages between user and selected dept
         selected_dept = get_object_or_404(Department, id=dept_id)
         user_dept = request.user.userprofile.department
 
@@ -40,7 +40,7 @@ def chat_view(request, dept_id=None):
 
         messages = messages.order_by("timestamp")
 
-        # Mark messages as read
+        # Mark messages as read for induvidual users
         unread_msgs = Message.objects.filter(
             to_department=user_dept,
             sender__userprofile__department=selected_dept
@@ -50,10 +50,10 @@ def chat_view(request, dept_id=None):
             msg.readers.add(request.user)
 
     return render(request, 'chat.html', {
-        'departments': departments,
-        'selected_dept': selected_dept,
-        'messages': messages,
-        'file_form': file_form,
-        'files': files,
-        'message_form': form
+        'departments': departments, # list of depts to be shown on left side
+        'selected_dept': selected_dept, # selected dept the user wants to chat with
+        'messages': messages, # All messages between user and selected dept
+        'file_form': file_form,  # File form where user uploads file
+        'files': files, # uploaded file info
+        'message_form': form # Message form where users send message
     })
