@@ -1,112 +1,248 @@
 {% load crispy_forms_tags %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Chat {{ request.user.name }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" >
+  <link rel="stylesheet" href="{% static 'bower_components/bootstrap/dist/css/bootstrap.min.css' %}" >
+  <link rel="stylesheet" href="{% static 'bower_components/font-awesome/css/font-awesome.min.css' %}" >
+  <link rel="stylesheet" href="{% static 'bower_components/Ionicons/css/ionicons.min.css' %}" >
+  <link rel="stylesheet" href="{% static 'bower_components/jvectormap/jquery-jvectormap.css' %}">
+  <link rel="stylesheet" href="{% static 'dist/css/AdminLTE.css' %}">
+  <link rel="stylesheet" href="{% static 'plugins/iCheck/square/blue.css' %}">
+  <link rel="stylesheet" href="{% static 'dist/css/skins/_all-skins.min.css' %}">
 
-    <style>
-        #chatWindow {
-            height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            padding: 10px;
-            background: #f9f9f9;
-            margin-bottom: 20px;
-        }
-        .message {
-            margin-bottom: 10px;
-        }
-        .message .sender {
-            font-weight: bold;
-        }
-        .dept-list a.active {
-            font-weight: bold;
-            color: #0d6efd;
-        }
-        .badge.d-none {
-            display: none
-        }
-    </style>
+<style type="text/css">
+#chatWindow{height:400px;}
+.jqstooltip { position: absolute;left: 0px;top: 0px;visibility: hidden;background: rgb(0, 0, 0) transparent;background-color: rgba(0,0,0,0.6);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";color: white;font: 10px arial, san serif;text-align: left;white-space: nowrap;padding: 5px;border: 1px solid white;box-sizing: content-box;z-index: 10000;}.jqsfield { color: white;font: 10px arial, san serif;text-align: left;}</style><style type="text/css">
+@font-face {
+	font-family: 'Atlassian Sans Ext';
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url('chrome-extension://liecbddmkiiihnedobmlmillhodjkdmb/fonts/AtlassianSans-cyrillic-ext.woff2') format('woff2');
+	unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+
+@font-face {
+	font-family: 'Atlassian Sans Ext';
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url('chrome-extension://liecbddmkiiihnedobmlmillhodjkdmb/fonts/AtlassianSans-cyrillic.woff2') format('woff2');
+	unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+	font-family: 'Atlassian Sans Ext';
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url('chrome-extension://liecbddmkiiihnedobmlmillhodjkdmb/fonts/AtlassianSans-vietnamese.woff2') format('woff2');
+	unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0,
+		U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+
+@font-face {
+	font-family: 'Atlassian Sans Ext';
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url('chrome-extension://liecbddmkiiihnedobmlmillhodjkdmb/fonts/AtlassianSans-latin.woff2') format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+		U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+	font-family: 'Atlassian Sans Ext';
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url('chrome-extension://liecbddmkiiihnedobmlmillhodjkdmb/fonts/AtlassianSans-latin-ext.woff2') format('woff2');
+	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308,
+		U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113,
+		U+2C60-2C7F, U+A720-A7FF;
+}</style>
+
 </head>
-<body>
-<div class="container-fluid">
-    <div class="row">
 
-        <!-- Department Sidebar -->
-        <div class="col-md-3">
-            <h5 class="mt-3">Departments</h5>
-            <!-- In chat.html -->
-            <ul class="list-group dept-list" id="deptList">
-                {% for dept in departments %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <a href="{% url 'chat_with_dept' dept.id %}"
-                           class="{% if selected_dept and selected_dept.id == dept.id %}active{% endif %}">
-                            {{ dept.name }}
-                        </a>
-                        <span class="badge bg-danger rounded-pill d-none" id="unread_{{ dept.id }}">0</span>
-                    </li>
-                {% endfor %}
+
+<body class="skin-blue sidebar-mini fixed sidebar-mini-expand-feature">
+<div class="wrapper" style="height: auto; min-height: 100%;">
+
+<header class="main-header">
+
+    <!-- Logo -->
+    <a href="home.php" class="logo">
+      <!-- mini logo for sidebar mini 50x50 pixels -->
+      <span class="logo-mini"><b>DM</b>C&amp;H</span>
+      <!-- logo for regular state and mobile devices -->
+      <span class="logo-lg"><b>DMC&amp;H </b>MANAGEMENT SYSTEM</span>
+    </a>
+
+    <!-- Header Navbar: style can be found in header.less -->
+    <nav class="navbar navbar-static-top">
+      <!-- Sidebar toggle button-->
+      <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+        <span class="sr-only">Toggle navigation</span>
+      </a>
+      <!-- Navbar Right Menu -->
+      <div class="navbar-custom-menu">
+        <ul class="nav navbar-nav">
+         
+          <li class="dropdown user user-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <img src="{% static 'dist/img/user2-160x160.jpg'%}" class="user-image" alt="User Image">
+              <span class="hidden-xs"> {{ request.user.name }}</span>
+            </a>
+            <ul class="dropdown-menu">
+              <!-- User image -->
+              <li class="user-header">
+                <img src="{% static 'dist/img/user2-160x160.jpg'%}" class="img-circle" alt="User Image">
+                <p>
+               {{ request.user.name }}
+                </p>
+              </li>
+              <!-- Menu Footer-->
+              <li class="user-footer">
+                
+                <div class="pull-right">
+					<form method="post" action="{% url 'logout' %}">
+					{% csrf_token %}
+					<button type="submit" class="btn btn-default btn-flat">logout</button>
+					</form>
+                </div>
+              </li>
             </ul>
-            <br>
-            <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">logout</button>
-            </form>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </header>
 
-        </div>
 
-<div class="col-md-6">
-    <h4 class="mt-3">
-        {% if selected_dept %}
+
+
+
+<div class="content-wrapper">
+	<section class="content">
+    <div class="row">
+	
+	
+<div class="col-md-3 ">
+
+
+
+<div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">Departments</h3>
+
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <ul class="products-list product-list-in-box">
+			  
+			  {% for dept in departments %}
+			  
+			  
+			   <li class="item">
+					<a href="{% url 'chat_with_dept' dept.id %}" class="product-title">
+                  <div class="product-img">
+                  <i class="fa fa-bank "></i>
+                  </div>
+                  <div class="product-info">
+                    {{ dept.name }}
+                      <span class="label label-warning pull-right" id="unread_{{ dept.id }}">0</span>
+                   
+                  </div>
+				  </a>
+                </li>
+				{% endfor %}
+
+				
+                <!-- /.item -->
+              </ul>
+            </div>
+            <!-- /.box-footer -->
+          </div>
+		  
+		  
+</div>
+
+
+<div class="col-md-9 ">
+<div class="box box-primary direct-chat direct-chat-primary">
+<div class="box-header with-border">
+                  <h3 class="box-title">
+				  {% if selected_dept %}
             Chat with <strong>{{ selected_dept.name }}</strong>
         {% else %}
             Select a department to start chatting
-        {% endif %}
-    </h4>
-
-    {% if selected_dept %}
-        <div id="chatWindow">
-            {% for msg in messages %}
-                <div class="message">
-                    <div class="sender text-muted small">
-                        {{ msg.sender.name }} ({{ msg.sender.userprofile.department.name }}) at {{ msg.timestamp|date:"H:i" }}
-                    </div>
-                    <div>{{ msg.content | safe }}</div>
+        {% endif %}</h3>
+                  <div class="box-tools pull-right"></div>
                 </div>
+    {% if selected_dept %}
+	<div class="box-body">
+                  <!-- Conversations are loaded here -->
+                  <div class="direct-chat-messages" id="chatWindow">
+            {% for msg in messages %}
+			<div class="direct-chat-msg mb-5">
+			  <div class="direct-chat-info clearfix">
+				<span class="direct-chat-name pull-left">{{ msg.sender.name }} - ({{ msg.sender.userprofile.department.name }})</span>
+				<span class="direct-chat-timestamp pull-right">{{ msg.timestamp|date:"H:i" }}</span>
+			  </div>
+			  <!-- /.direct-chat-info -->
+			  <img class="direct-chat-img" src="{% static 'dist/img/user1-128x128.jpg' %}" alt="message user image">
+			  <!-- /.direct-chat-img -->
+			  <div class="direct-chat-text">
+			  {{ msg.content | safe }}
+				
+			  </div>
+			  <!-- /.direct-chat-text -->
+			</div>
             {% empty %}
                 <div class="text-muted">No messages yet.</div>
             {% endfor %}
         </div>
-
-        <form method="post" id="chatForm">
+		</div>
+			<div class="box-footer">
+                  <form method="post" id="chatForm">
             {% csrf_token %}
 
             <input type="hidden" id="toDeptId" name="to_department" value="{{ selected_dept.id }}">
-
-            <div class="mb-2">
-                <textarea name="{{ message_form.content.name }}" id="id_{{ message_form.content.name }}"
-                          class="form-control"
-                          rows="3"
-                          placeholder="Type your message…">{{ message_form.content.value|default_if_none:'' }}</textarea>
-                {% for error in message_form.content.errors %}
-                    <div class="text-danger small">{{ error }}</div>
-                {% endfor %}
-            </div>
-
-            <div class="mb-2">
-                <label for="fileInput" class="form-label">Attach file:</label>
+			
+			
+            <div class="form-group  col-md-12" style="display:none">
+			    <label for="fileInput" >Attach file:</label>
                 <input type="file" id="fileInput" class="form-control">
             </div>
-
-            <button type="submit" class="btn btn-primary mt-2">Send</button>
+			
+			
+			<div class="form-group  col-md-12">
+				<textarea name="{{ message_form.content.name }}" id="id_{{ message_form.content.name }}"
+				  class="form-control" rows="3"  placeholder="Type your message…"></textarea>
+			</div>
+			
+			<div class="form-group  col-md-12">
+				<button type="submit" class="btn btn-primary">Send</button>
+			</div>
+			
+					{% for error in message_form.content.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+                  </form>
+			</div>
         </form>
     {% endif %}
 </div>
-
+</div>
 
     </div>
+	</section>
+</div>
 </div>
 <script>
     const selectedDeptId = "{{ selected_dept.id }}";
@@ -146,10 +282,19 @@
             }
 
             msgDiv.innerHTML = `
-                <div class="sender text-muted small">
-                    ${data.sender} (${data.sender_dept}) → ${data.receiver_dept} at ${timestamp}
-                </div>
-                ${contentHTML}
+                <div class="direct-chat-msg mb-5">
+				  <div class="direct-chat-info clearfix">
+					<span class="direct-chat-name pull-left">${data.sender} - ${data.sender_dept}</span>
+					<span class="direct-chat-timestamp pull-right">${timestamp}</span>
+				  </div>
+				  <!-- /.direct-chat-info -->
+				  <img class="direct-chat-img" src="/static/dist/img/user1-128x128.jpg" alt="message user image">
+				  <!-- /.direct-chat-img -->
+				  <div class="direct-chat-text">
+				  ${contentHTML}
+				  </div>
+				  <!-- /.direct-chat-text -->
+				</div>
             `;
 
             chatWindow.appendChild(msgDiv);
@@ -209,6 +354,29 @@
         fileInput.value = '';
     });
 </script>
+
+<script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}" ></script>
+<script src="{% static 'bower_components/jquery-ui/jquery-ui.min.js' %}" ></script>
+<script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}" ></script>
+
+<script src="{% static 'plugins/iCheck/icheck.min.js' %}" ></script>
+<!-- FastClick -->
+<script src="{% static 'bower_components/fastclick/lib/fastclick.js' %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static 'dist/js/adminlte.min.js' %}"></script>
+<!-- Sparkline -->
+<script src="{% static 'bower_components/jquery-sparkline/dist/jquery.sparkline.min.js' %}"></script>
+<!-- jvectormap  -->
+<script src="{% static 'plugins/jvectormap/jquery-jvectormap-1.2.2.min.js' %}"></script>
+<script src="{% static 'plugins/jvectormap/jquery-jvectormap-world-mill-en.js' %}"></script>
+<!-- SlimScroll -->
+<script src="{% static 'bower_components/jquery-slimscroll/jquery.slimscroll.min.js' %}"></script>
+<!-- ChartJS -->
+<script src="{% static 'bower_components/chart.js/Chart.js' %}"></script>
+<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+<script src="{% static 'dist/js/pages/dashboard2.js' %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static 'dist/js/demo.js' %}"></script>
 
 
 </body>
